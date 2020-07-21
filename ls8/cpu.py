@@ -16,7 +16,7 @@ class CPU:
 
     def write_ram(self, mar, mdr):
         self.ram[mar] = mdr
-        
+
     def load(self):
         """Load a program into memory."""
 
@@ -70,4 +70,6 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        LDI = 0b10000010
+        HLT = 0b00000001 
+        PRN = 0b01000111
