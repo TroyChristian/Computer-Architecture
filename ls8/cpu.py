@@ -10,6 +10,7 @@ class CPU:
         self.pc = 0
         self.reg = [0] * 8
         self.ram = [0] * 256
+        self.running = True 
 
     def read_ram(self, mar):
         return self.ram[mar] 
@@ -73,3 +74,23 @@ class CPU:
         LDI = 0b10000010
         HLT = 0b00000001 
         PRN = 0b01000111
+
+        while self.running:
+            IR = self.read_ram(self.pc)
+            if IR == LDI:
+                register_number = self.read_ram(self.pc + 1)
+                value_read = self.read_ram(self.pc + 2)
+                self.write_ram(register_number, value_read)
+                self.pc += 3
+            
+            elif IR == PRN:
+                register_number = self.read_ram(self.pc + 1)
+                print(self.ram[register_number])
+                self.pc += 2
+            elif IR == HLT:
+                self.running = False
+            
+            else:
+                print("Bad instruction at {} indexed at address {}".format(ir, self.pc))
+                sys.exit(1)
+
