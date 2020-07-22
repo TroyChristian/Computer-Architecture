@@ -19,39 +19,27 @@ class CPU:
         self.ram[mar] = mdr
 
     def load(self):
-        """Load a program into memory."""
+        program = sys.argv[1]
 
-        address = 0
+        with open(program) as open_program:
+             for index, instruction in enumerate(open_program):# Tuple unpacking (0, 0b111)
+                 instruction = instruction.split('#') # Strip comments from program.py ^^
+                 try:
+                     value = int(instruction[0], 2) #Get base 10 representation of the binary string
+                     self.write_ram(index, value) # Place instruction at specified index in memory array
+                
+                 except FileNotFoundError:
+                    print("File specified in input, as {} not found".format(program))
+        print("Load invoked!")
 
-        # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8 2 operands, is not ALU, does not move PC, code 2, set val of reg to int
-            0b00000000, # register number register 0 in this case
-            0b00001000, # integer arg, 8 in this case in base 10
-            0b01000111, # PRN R0, takes 1 arg, is not Alu, does not move PC code 7, print val of int at reg
-            0b00000000, # Reg 0 being passed in as argument to to PRN
-            0b00000001, # HLT Code 1, exit emulator
-        ]
-
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
-            # Pass the above binary numbers into indexes of self.ram
-            """
-          0  [0b10000010]
-          1 [ 0b00000000]
-          2 [0b00001000]
-          3 [ 0b01000111]
-          4  [0b00000000]
-          5  [0b00000001]
+                  
 
 
 
 
-            """
 
+       
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
