@@ -1,9 +1,15 @@
-"""CPU functionality."""
+
 
 import sys
-
+MUL = 0b10100010
+HLT = 0b00000001
+PRN = 0b01000111
+NOP = 0b00000000
+LDI = 0b10000010
 class CPU:
     """Main CPU class."""
+    
+
 
     def __init__(self):
         """Construct a new CPU."""
@@ -11,26 +17,80 @@ class CPU:
         self.reg = [0] * 8 # 8 Registers
         self.ram = [0] * 256 # Represents 2^8, 8 bit architecture 
         self.running = True 
+        self.ir = 0
+
+    def LDI_instruction(self):
+        index = self.read_ram(self.pc + 1)
+        value = self.read_ram(self.pc + 2)
+        self.reg[index] = value
+        self.pc += 3
+
+    def MUL_instruction(self):
+        reg_a = self.read_ram(self.pc + 1)
+        reg_b = self.read_ram(self.pc + 2)
+        self.alu("MUL", reg_a, reg_b)
+        self.pc += 3
+
+    def HLT_instruction(self):
+        self.running = False
+    
+    def PRN_instruction(self):
+        index = self.read_ram(self.pc + 1)
+        print(self.reg[index])
+        self.pc += 2 
+
+    def NOP_instruction(self):
+        self.pc += 1
+    #Instruction Set
+    def instruction_set(self, code):
+        instruction_table = {
+            MUL: self.MUL_instruction,
+            HLT: self.HLT_instruction,
+            PRN: self.PRN_instruction,
+            NOP: self.NOP_instruction,
+            LDI: self.LDI_instruction
+        }
+
+        function = instruction_table[code]
+        if instruction_table[code] != None:
+           function()
+       
+        else:
+            print("unknown function call {} at ram[{}]".format(self.pc))
+            sys.exit(1)
+
 
     def read_ram(self, mar): # Takes in Memory Address Register (MAR holds a copy of the current instruc.)
         return self.ram[mar] 
 
     def write_ram(self, mar, mdr): #Write MDR (current value) to Memory Address Register
         self.ram[mar] = mdr
+    
+    
+
 
     def load(self):
         program = sys.argv[1]
-
-        with open(program) as open_program:
-             for index, instruction in enumerate(open_program):# Tuple unpacking (0, 0b111)
-                 instruction = instruction.split('#') # Strip comments from program.py ^^
-                 try:
-                     value = int(instruction[0], 2) #Get base 10 representation of the binary string
-                     self.write_ram(index, value) # Place instruction at specified index in memory array
-                
-                 except FileNotFoundError:
-                    print("File specified in input, as {} not found".format(program))
-        print("Load invoked!")
+        try:
+            with open(program) as open_program:
+                for index, instruction in enumerate(open_program):# Tuple unpacking (0, 0b111)
+                    instruction_no_comment = instruction.split('#') # Strip comments from program.py ^^
+              
+                    instruction_no_comment_no_whitespace = instruction_no_comment[0].strip() 
+                    print("INSTRUCTION:{}".format(instruction_no_comment_no_whitespace))
+                    #if instruction_no_comment_no_whitespace == '':
+                        #continue
+                 
+                    value = int(instruction_no_comment_no_whitespace, 2) #Get base 10 representation of the binary string
+                    self.write_ram(index, value) # Place instruction at specified index in memory array
+                    print("{} is the binary instruction, the index is in ram array is {}".format(self.read_ram(index), index))
+                    print(type(self.read_ram(index)))
+                open_program.close() 
+                        
+        except FileNotFoundError:
+                print("File specified in input, as {} not found".format(program))
+        
+       
 
 
                   
@@ -46,9 +106,11 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        if op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
+        
 
     def trace(self):
         """
@@ -60,9 +122,9 @@ class CPU:
             self.pc,
             #self.fl,
             #self.ie,
-            self.ram_read(self.pc),
-            self.ram_read(self.pc + 1),
-            self.ram_read(self.pc + 2)
+            self.read_ram(self.pc),
+            self.read_ram(self.pc + 1),
+            self.read_ram(self.pc + 2)
         ), end='')
 
         for i in range(8):
@@ -70,28 +132,20 @@ class CPU:
 
         print()
 
+
+
     def run(self):
         """Run the CPU."""
-        LDI = 0b10000010
-        HLT = 0b00000001 
-        PRN = 0b01000111
+
+
+
 
         while self.running:
-            IR = self.read_ram(self.pc) # Instruction Register, get instruction out of where the pc is pointing in ram
-            if IR == LDI: #If PC is pointing at an index in ram that holds LDI #0b10000010
-                register_number = self.read_ram(self.pc + 1) # Read the next register number
-                value_read = self.read_ram(self.pc + 2) # read the value at pc + 2
-                self.write_ram(register_number, value_read)
-                self.pc += 3
+            self.trace()
+            print(self.pc) 
+            instruction_register = self.read_ram(self.pc)
+            print(instruction_register)
+            self.instruction_set(instruction_register)
             
-            elif IR == PRN:
-                register_number = self.read_ram(self.pc + 1)
-                print(self.ram[register_number])
-                self.pc += 2
-            elif IR == HLT:
-                self.running = False
-            
-            else:
-                print("Bad instruction at {} indexed at address {}".format(ir, self.pc))
-                sys.exit(1)
+
 
