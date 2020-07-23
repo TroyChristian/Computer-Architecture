@@ -6,6 +6,10 @@ HLT = 0b00000001
 PRN = 0b01000111
 NOP = 0b00000000
 LDI = 0b10000010
+PUSH = 0b01000101 
+POP = 0b01000110
+CALL = 0b01010000 #160
+RET = 0b00010001
 class CPU:
     """Main CPU class."""
     
@@ -13,17 +17,44 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
+
+        """
+        * R5 is reserved as the interrupt mask (IM)
+        * R6 is reserved as the interrupt status (IS)
+        * R7 is reserved as the stack pointer (SP)
+        """
         self.pc = 0 # Program Counter
         self.reg = [0] * 8 # 8 Registers
         self.ram = [0] * 256 # Represents 2^8, 8 bit architecture 
         self.running = True 
         self.ir = 0
+        self.SP = 7 #index of reserved register Stack Pointer
+        self.IM = 5 #index of reserved register Intertupt Mask
+        self.IS = 6 #index of reserved register Stack Pointer
+        
+
 
     def LDI_instruction(self):
         index = self.read_ram(self.pc + 1)
         value = self.read_ram(self.pc + 2)
         self.reg[index] = value
         self.pc += 3
+
+    def PUSH_instruction(self):
+        index = self.read_ram(self.pc + 1)
+        value = self.reg[index]
+        self.reg[self.SP] -= 1
+        self.ram[self.reg[self.SP]] = value
+        self.pc += 2 
+
+    def POP_instruction(self):
+        index = self.read_ram(self.pc + 1)
+        value = self.ram[self.reg[self.SP]]
+        self.reg[index] = value 
+
+        self.reg[self.SP] += 1
+        self.pc += 2
+        
 
     def MUL_instruction(self):
         reg_a = self.read_ram(self.pc + 1)
@@ -38,6 +69,24 @@ class CPU:
         index = self.read_ram(self.pc + 1)
         print(self.reg[index])
         self.pc += 2 
+    
+    def CALL_instruction(self): # grab 
+        address_to_continue_from = self.pc + 2 
+        self.reg[self.SP] -= 1
+        self.ram[self.reg[self.SP]] = address_to_continue_from
+
+        register_index = self.ram[self.pc + 1]
+        address_of_subroutine = self.reg[register_index] 
+        self.pc = address_of_subroutine
+
+    def RET_instruction(self):
+        resume_address = self.ram[self.reg[self.SP]] # currently pointing at address to coninue from
+        self.reg[self.SP] += 1
+        self.pc = resume_address # so execution resumes here.
+
+
+
+    
 
     def NOP_instruction(self):
         self.pc += 1
@@ -48,7 +97,11 @@ class CPU:
             HLT: self.HLT_instruction,
             PRN: self.PRN_instruction,
             NOP: self.NOP_instruction,
-            LDI: self.LDI_instruction
+            LDI: self.LDI_instruction,
+            PUSH: self.PUSH_instruction,
+            POP: self.POP_instruction,
+            CALL: self.CALL_instruction,
+            RET: self.RET_instruction
         }
 
         function = instruction_table[code]
