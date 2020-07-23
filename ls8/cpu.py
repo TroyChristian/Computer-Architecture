@@ -80,8 +80,11 @@ class CPU:
                     print("INSTRUCTION:{}".format(instruction_no_comment_no_whitespace))
                     #if instruction_no_comment_no_whitespace == '':
                         #continue
-                 
-                    value = int(instruction_no_comment_no_whitespace, 2) #Get base 10 representation of the binary string
+                    
+                    try:
+                        value = int(instruction_no_comment_no_whitespace, 2) #Get base 10 representation of the binary string
+                    except ValueError:
+                            continue 
                     self.write_ram(index, value) # Place instruction at specified index in memory array
                     print("{} is the binary instruction, the index is in ram array is {}".format(self.read_ram(index), index))
                     print(type(self.read_ram(index)))
@@ -89,6 +92,7 @@ class CPU:
                         
         except FileNotFoundError:
                 print("File specified in input, as {} not found".format(program))
+               
         
        
 
@@ -141,10 +145,10 @@ class CPU:
 
 
         while self.running:
-            self.trace()
-            print(self.pc) 
+            #self.trace()
+            #print(self.pc) 
             instruction_register = self.read_ram(self.pc)
-            print(instruction_register)
+            #print(instruction_register)
             self.instruction_set(instruction_register)
             
 

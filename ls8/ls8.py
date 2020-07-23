@@ -12,4 +12,3 @@ cpu = CPU()
 
 cpu.load()
 cpu.run()
-print("ls8 executed")
