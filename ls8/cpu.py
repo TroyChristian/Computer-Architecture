@@ -63,6 +63,12 @@ class CPU:
         self.alu("MUL", reg_a, reg_b)
         self.pc += 3
 
+    def ADD_instruction(self):
+        reg_a = self.read_ram(self.pc + 1)
+        reg_b = self.read_ram(self.pc + 2)
+        self.alu("ADD", reg_a, reg_b)
+        self.pc += 3
+
     def HLT_instruction(self):
         self.running = False
     
@@ -85,11 +91,7 @@ class CPU:
         self.reg[self.SP] += 1
         self.pc = resume_address # so execution resumes here.
 
-    def ADD_instruction(self):
-        reg_a = self.read_ram(self.pc + 1)
-        reg_b = self.read_ram(self.pc + 2)
-        self.alu("ADD", reg_a, reg_b)
-        self.pc += 3
+
 
 
 
@@ -108,8 +110,9 @@ class CPU:
             PUSH: self.PUSH_instruction,
             POP: self.POP_instruction,
             CALL: self.CALL_instruction,
-            RET: self.RET_instruction,
-            ADD: self.ADD_instruction
+            ADD: self.ADD_instruction,
+            RET: self.RET_instruction
+            
         }
 
         function = instruction_table[code]
@@ -170,9 +173,9 @@ class CPU:
         """ALU operations."""
         print("op passed into alu is: {}".format(op))
         print(type(op))
-        if op == 0b10101000:
+        if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        if op == "MUL":
+        elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
