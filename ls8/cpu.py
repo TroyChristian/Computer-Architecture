@@ -8,8 +8,9 @@ NOP = 0b00000000
 LDI = 0b10000010
 PUSH = 0b01000101 
 POP = 0b01000110
-CALL = 0b01010000 #160
+CALL = 0b01010000 #80
 RET = 0b00010001
+ADD = 0b10101000 #168
 class CPU:
     """Main CPU class."""
     
@@ -84,6 +85,12 @@ class CPU:
         self.reg[self.SP] += 1
         self.pc = resume_address # so execution resumes here.
 
+    def ADD_instruction(self):
+        reg_a = self.read_ram(self.pc + 1)
+        reg_b = self.read_ram(self.pc + 2)
+        self.alu("ADD", reg_a, reg_b)
+        self.pc += 3
+
 
 
     
@@ -101,7 +108,8 @@ class CPU:
             PUSH: self.PUSH_instruction,
             POP: self.POP_instruction,
             CALL: self.CALL_instruction,
-            RET: self.RET_instruction
+            RET: self.RET_instruction,
+            ADD: self.ADD_instruction
         }
 
         function = instruction_table[code]
@@ -160,13 +168,15 @@ class CPU:
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
-
-        if op == "ADD":
+        print("op passed into alu is: {}".format(op))
+        print(type(op))
+        if op == 0b10101000:
             self.reg[reg_a] += self.reg[reg_b]
         if op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
+            
         
 
     def trace(self):
