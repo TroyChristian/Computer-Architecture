@@ -156,7 +156,7 @@ class CPU:
         self.pc = address
 
     def JEQ_instruction(self):
-        if self.flag_registers == [0b00000001] or self.equal_flag == "EQUAL":
+        if self.equal_flag == "EQUAL":
            register_number = self.ram[self.pc+1]
            index = self.reg[register_number]
            self.pc = index
@@ -165,7 +165,7 @@ class CPU:
        
     
     def JNE_instruction(self):
-        if self.flag_registers == [0b00000000] or self.equal_flag != "EQUAL":
+        if self.equal_flag != "EQUAL":
             register_number = self.ram[self.pc+1]
             index = self.reg[register_number]
             self.pc = index
@@ -321,16 +321,24 @@ class CPU:
     def run(self):
         """Run the CPU."""
         while self.running:
-            #self.trace()
+            
+            self.trace()
             instruction = self.read_ram(self.pc)
 
            
             command = self.instruction_table[instruction]
+            if command == self.instruction_table[JNE] or  command == self.instruction_table[JEQ] and self.equal_flag != "EQUAL":
+                self.pc += 2
+                continue
+            if command == self.instruction_table[JEQ] and self.equal_flag == "EQUAL":
+                self.pc += 2
+                continue
             #instruction_in_bin = bin(instruction)
             #instruction_in_bin_str = str(instruction_in_bin)
             
-            #print("CALLING {}" .format(command.__name__))
+            print("CALLING {}" .format(command.__name__))
             command()
+            
 
         print("TERMINATED")
 
