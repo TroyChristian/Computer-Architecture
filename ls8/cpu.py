@@ -142,10 +142,10 @@ class CPU:
     def CMP_instruction(self):
         first_reg = self.read_ram(self.pc + 1)
   
-        print("Value of first reg in CMP_instruction is {}".format(first_reg))
+       
         second_reg = self.read_ram(self.pc + 2)
        
-        print("Value of second reg in CMP_instruction is {}".format(second_reg))
+       
 
         self.alu("CMP", first_reg, second_reg)
         self.pc += 3
@@ -156,7 +156,7 @@ class CPU:
         self.pc = address
 
     def JEQ_instruction(self):
-        if self.equal_flag == "EQUAL":
+        if self.flag_registers == [0b00000001] or self.equal_flag == "EQUAL":
            register_number = self.ram[self.pc+1]
            index = self.reg[register_number]
            self.pc = index
@@ -165,13 +165,18 @@ class CPU:
        
     
     def JNE_instruction(self):
-        if self.equal_flag != "EQUAL":
+        if self.flag_registers == [0b00000000] or self.equal_flag != "EQUAL":
+           
             register_number = self.ram[self.pc+1]
             index = self.reg[register_number]
-            self.pc = index
+            
             print("JNE jump has pc set to value of {}".format(self.pc))
         else:
             self.pc += 2
+
+       
+               
+        
     
    
 
@@ -321,26 +326,87 @@ class CPU:
     def run(self):
         """Run the CPU."""
         while self.running:
-            
-            self.trace()
-            instruction = self.read_ram(self.pc)
+            #self.trace()
+            #print(self.pc) 
+            instruction_register = self.read_ram(self.pc)
+            #print(instruction_register)
+            self.instruction_set(instruction_register)
+          
+
 
            
-            command = self.instruction_table[instruction]
-            if command == self.instruction_table[JNE] or  command == self.instruction_table[JEQ] and self.equal_flag != "EQUAL":
-                self.pc += 2
-                continue
-            if command == self.instruction_table[JEQ] and self.equal_flag == "EQUAL":
-                self.pc += 2
-                continue
-            #instruction_in_bin = bin(instruction)
-            #instruction_in_bin_str = str(instruction_in_bin)
             
+            
+
+           
+            command = self.instruction_table[instruction_register]
             print("CALLING {}" .format(command.__name__))
             command()
             
 
         print("TERMINATED")
+
+
+
+
+
+
+
+            # """ """ 
+            # Current_Instruction = self.read_ram(self.pc)
+            # first_arg = self.read_ram(self.pc + 1)
+            # second_arg  = self.read_ram(self.pc + 2)
+
+            # if Current_Instruction == LDI:
+            #      self.reg[first_arg] = first_arg
+            #      self.pc += 3
+
+            # elif Current_Instruction == PRN:
+            #      print(self.reg[first_arg])
+            #      self.pc += 2
+
+            # elif Current_Instruction == MUL:
+            #     self.reg[first_arg] = self.reg[first_arg] * self.reg[second_arg]
+            #     self.pc += 3
+
+            # elif Current_Instruction == ADD:
+            #     self.reg[first_arg] = self.reg[first_arg] + self.reg[second_arg]
+
+            # elif Current_Instruction == CMP:
+            #     if self.reg[first_arg] == self.reg[second_arg]:
+            #          self.equal_flag = "EQUAL"
+            #     elif self.reg[first_arg] < self.reg[second_arg]:
+            #         self.equal_flag = "LESS"
+            #     elif self.reg[first_arg] > self.reg[second_arg]:
+            #         self.equal_flag = "GREATER"
+            #     self.pc += 3
+            
+            # elif Current_Instruction == JMP:
+            #     self.pc = self.reg[first_arg]
+            
+            # elif Current_Instruction == JNE:
+            #     if self.equal_flag == "GREATER" or self.equal_flag == "LESS":
+            #         self.pc = self.reg[first_arg]
+            #         self.equal_flag = ""
+            #     else:
+            #         self.pc += 2
+            # elif Current_Instruction == JEQ:
+            #     if self.equal_flag == "EQUAL":
+            #         self.pc = self.reg[operand_a]
+            #         self.equal_flag = "" 
+            #     else:
+            #         self.pc += 2
+            # elif Current_Instruction == HLT:
+            #     self.running = False
+            # elif Current_Instruction == NOP:
+            #     self.pc += 1
+            
+          
+            
+            
+            
+
+       
 
 
            
