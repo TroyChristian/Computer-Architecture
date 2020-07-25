@@ -346,60 +346,6 @@ class CPU:
 
         print("TERMINATED")
 
-
-
-
-
-
-
-            # """ """ 
-            # Current_Instruction = self.read_ram(self.pc)
-            # first_arg = self.read_ram(self.pc + 1)
-            # second_arg  = self.read_ram(self.pc + 2)
-
-            # if Current_Instruction == LDI:
-            #      self.reg[first_arg] = first_arg
-            #      self.pc += 3
-
-            # elif Current_Instruction == PRN:
-            #      print(self.reg[first_arg])
-            #      self.pc += 2
-
-            # elif Current_Instruction == MUL:
-            #     self.reg[first_arg] = self.reg[first_arg] * self.reg[second_arg]
-            #     self.pc += 3
-
-            # elif Current_Instruction == ADD:
-            #     self.reg[first_arg] = self.reg[first_arg] + self.reg[second_arg]
-
-            # elif Current_Instruction == CMP:
-            #     if self.reg[first_arg] == self.reg[second_arg]:
-            #          self.equal_flag = "EQUAL"
-            #     elif self.reg[first_arg] < self.reg[second_arg]:
-            #         self.equal_flag = "LESS"
-            #     elif self.reg[first_arg] > self.reg[second_arg]:
-            #         self.equal_flag = "GREATER"
-            #     self.pc += 3
-            
-            # elif Current_Instruction == JMP:
-            #     self.pc = self.reg[first_arg]
-            
-            # elif Current_Instruction == JNE:
-            #     if self.equal_flag == "GREATER" or self.equal_flag == "LESS":
-            #         self.pc = self.reg[first_arg]
-            #         self.equal_flag = ""
-            #     else:
-            #         self.pc += 2
-            # elif Current_Instruction == JEQ:
-            #     if self.equal_flag == "EQUAL":
-            #         self.pc = self.reg[operand_a]
-            #         self.equal_flag = "" 
-            #     else:
-            #         self.pc += 2
-            # elif Current_Instruction == HLT:
-            #     self.running = False
-            # elif Current_Instruction == NOP:
-            #     self.pc += 1
             
           
             
