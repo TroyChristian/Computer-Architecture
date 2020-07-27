@@ -16,6 +16,7 @@ JMP = 0b01010100
 JEQ = 0b01010101
 JNE = 0b01010110
 JGT = 0b01010111
+SCF = 0b00000011
 
 
 class CPU:
@@ -40,7 +41,7 @@ class CPU:
         self.reg[self.SP] = 0xF4 #index of reserved register Stack Pointer
         self.IM = 5 #index of reserved register Intertupt Mask
         self.IS = 6 #index of reserved register Stack Pointer
-        self.flag_registers = [0b00000000]
+        self.flag_registers = 0b00000000 # changed from list
         self.equal_flag = False 
 
         self.lookup_table = {
@@ -58,7 +59,8 @@ class CPU:
             "0b01010100" : "JMP",
             "0b01010101" : "JEQ", 
             "0b01010110" : "JNE",
-            "0b01010111" : "JGT"
+            "0b01010111" : "JGT",
+            "0b00000011" : "SCF"
 
         }
 
@@ -77,6 +79,7 @@ class CPU:
             JEQ: self.JEQ_instruction,
             JMP: self.JMP_instruction,
             JNE: self.JNE_instruction,
+            SCF: self.SCF_instruction
         }
         
 
@@ -141,9 +144,12 @@ class CPU:
 
     def CMP_instruction(self):
         first_reg = self.read_ram(self.pc + 1)
+        
+        
   
        
         second_reg = self.read_ram(self.pc + 2)
+        
        
        
 
@@ -152,28 +158,37 @@ class CPU:
     
     def JMP_instruction(self):
         index = self.read_ram(self.pc + 1)
-        address = self.reg[index]
-        self.pc = address
+        test = self.reg[index]
+        print("test is the address".format(test))
+        if test == JMP or test == 73 :
+            self.pc += 2
+            return
+        self.pc = self.reg[index]
 
     def JEQ_instruction(self):
         if self.flag_registers == [0b00000001] or self.equal_flag == "EQUAL":
-           register_number = self.ram[self.pc+1]
-           index = self.reg[register_number]
-           self.pc = index
+            
+           self.JMP_instruction() 
         else:
-            self.pc +=2 
+            self.pc += 2 #change from + 2 to plus, plus 2 had me landing on a arg
+            print("JEQ IS ELSING PC + 2")
+            print("THIS IS THE INSTRUCTION PC IS POINTING AT: {}".format(self.read_ram(self.pc)))
        
     
     def JNE_instruction(self):
         if self.flag_registers == [0b00000000] or self.equal_flag != "EQUAL":
+
            
-            register_number = self.ram[self.pc+1]
-            index = self.reg[register_number]
+            #register_number = self.ram[self.pc+1]
+            #index = self.reg[register_number]
+            #self.pc = index 
+            self.JMP_instruction() 
             
             print("JNE jump has pc set to value of {}".format(self.pc))
         else:
             self.pc += 2
-
+    def SCF_instruction(self):
+        self.pc += 1
        
                
         
@@ -280,17 +295,18 @@ class CPU:
             self.reg[reg_a] *= self.reg[reg_b]
         elif op == "CMP":
             if self.reg[reg_a] == self.reg[reg_b]:
-                self.flag_registers = [0b00000001] # 1
+                print("Inside CMP logic in alu: self.reg[reg_a] = {} and self.reg[reg_b] = {}".format(self.reg[reg_a], self.reg[reg_b]))
+                self.flag_registers = 0b00000001 # 1
                 self.equal_flag = "EQUAL"
                 print("reg_A is {}, reg_B is {}, equal_flag is {}, the pc is {}".format(self.reg[reg_a], self.reg[reg_b], self.equal_flag, self.pc))
                 print(self.flag_registers)
             elif self.reg[reg_a] < self.reg[reg_b]:
-                self.flag_registers = [0b00000100] # 4
+                self.flag_registers = 0b00000100 # 4
                 self.equal_flag = "LESS"
                 print("reg_A is {}, reg_B is {}, equal_flag is {}, the pc is {}".format(self.reg[reg_a], self.reg[reg_b], self.equal_flag, self.pc))
                 print(self.flag_registers)
             elif self.reg[reg_a] > self.reg[reg_b]:
-                self.flag_registers = [0b00000010] # 2
+                self.flag_registers = 0b00000010 # 2
                 self.equal_flag = "GREATER"
                 print("reg_A is {}, reg_B is {}, equal_flag is {}, the pc is {}".format(self.reg[reg_a], self.reg[reg_b], self.equal_flag, self.pc))
                 print(self.flag_registers)
@@ -326,11 +342,14 @@ class CPU:
     def run(self):
         """Run the CPU."""
         while self.running:
-            #self.trace()
-            #print(self.pc) 
+            self.trace()
+            print(self.pc) 
             instruction_register = self.read_ram(self.pc)
             #print(instruction_register)
-            self.instruction_set(instruction_register)
+            print("Before instruction is called pc value is: {}".format(self.pc))
+            #self.instruction_set(instruction_register)
+           
+
           
 
 
@@ -341,7 +360,9 @@ class CPU:
            
             command = self.instruction_table[instruction_register]
             print("CALLING {}" .format(command.__name__))
+
             command()
+            print("After the above instruction call the pc value is {}".format(self.pc))
             
 
         print("TERMINATED")
