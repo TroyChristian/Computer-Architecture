@@ -159,9 +159,14 @@ class CPU:
     def JMP_instruction(self):
         index = self.read_ram(self.pc + 1)
         test = self.reg[index]
-        print("test is the address".format(test))
+        pc_clone = self.pc
+        pc_clone = test
+        print("test is the address".format(pc_clone))
+        if pc_clone == 48:
+            self.pc += 8
+            return
         if test == JMP or test == 73 :
-            self.pc += 2
+            self.pc += 5
             return
         self.pc = self.reg[index]
 
@@ -366,8 +371,6 @@ class CPU:
             
 
         print("TERMINATED")
-
-            
           
             
             
