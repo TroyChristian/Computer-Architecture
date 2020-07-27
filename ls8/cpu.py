@@ -88,7 +88,7 @@ class CPU:
         index = self.read_ram(self.pc + 1) #reg number to index
         value = self.read_ram(self.pc + 2) #Value to put in reg
         self.reg[index] = value
-        print("REG #: {}. Holds a  value of {}".format([index], value))
+        #print("REG #: {}. Holds a  value of {}".format([index], value))
         self.pc += 3
 
     def PUSH_instruction(self):
@@ -161,7 +161,7 @@ class CPU:
         test = self.reg[index]
         pc_clone = self.pc
         pc_clone = test
-        print("test is the address".format(pc_clone))
+        #print("test is the address".format(pc_clone))
         if pc_clone == 48:
             self.pc += 8
             return
@@ -176,8 +176,8 @@ class CPU:
            self.JMP_instruction() 
         else:
             self.pc += 2 #change from + 2 to plus, plus 2 had me landing on a arg
-            print("JEQ IS ELSING PC + 2")
-            print("THIS IS THE INSTRUCTION PC IS POINTING AT: {}".format(self.read_ram(self.pc)))
+            #print("JEQ IS ELSING PC + 2")
+            #print("THIS IS THE INSTRUCTION PC IS POINTING AT: {}".format(self.read_ram(self.pc)))
        
     
     def JNE_instruction(self):
@@ -189,7 +189,7 @@ class CPU:
             #self.pc = index 
             self.JMP_instruction() 
             
-            print("JNE jump has pc set to value of {}".format(self.pc))
+            #print("JNE jump has pc set to value of {}".format(self.pc))
         else:
             self.pc += 2
     def SCF_instruction(self):
@@ -292,29 +292,29 @@ class CPU:
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
-        print("op passed into alu is: {}".format(op))
-        print(type(op))
+        #print("op passed into alu is: {}".format(op))
+        #print(type(op))
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
         elif op == "CMP":
             if self.reg[reg_a] == self.reg[reg_b]:
-                print("Inside CMP logic in alu: self.reg[reg_a] = {} and self.reg[reg_b] = {}".format(self.reg[reg_a], self.reg[reg_b]))
+                #print("Inside CMP logic in alu: self.reg[reg_a] = {} and self.reg[reg_b] = {}".format(self.reg[reg_a], self.reg[reg_b]))
                 self.flag_registers = 0b00000001 # 1
                 self.equal_flag = "EQUAL"
-                print("reg_A is {}, reg_B is {}, equal_flag is {}, the pc is {}".format(self.reg[reg_a], self.reg[reg_b], self.equal_flag, self.pc))
-                print(self.flag_registers)
+                #print("reg_A is {}, reg_B is {}, equal_flag is {}, the pc is {}".format(self.reg[reg_a], self.reg[reg_b], self.equal_flag, self.pc))
+                #print(self.flag_registers)
             elif self.reg[reg_a] < self.reg[reg_b]:
                 self.flag_registers = 0b00000100 # 4
                 self.equal_flag = "LESS"
-                print("reg_A is {}, reg_B is {}, equal_flag is {}, the pc is {}".format(self.reg[reg_a], self.reg[reg_b], self.equal_flag, self.pc))
-                print(self.flag_registers)
+                #print("reg_A is {}, reg_B is {}, equal_flag is {}, the pc is {}".format(self.reg[reg_a], self.reg[reg_b], self.equal_flag, self.pc))
+                #print(self.flag_registers)
             elif self.reg[reg_a] > self.reg[reg_b]:
                 self.flag_registers = 0b00000010 # 2
                 self.equal_flag = "GREATER"
-                print("reg_A is {}, reg_B is {}, equal_flag is {}, the pc is {}".format(self.reg[reg_a], self.reg[reg_b], self.equal_flag, self.pc))
-                print(self.flag_registers)
+                #print("reg_A is {}, reg_B is {}, equal_flag is {}, the pc is {}".format(self.reg[reg_a], self.reg[reg_b], self.equal_flag, self.pc))
+                #print(self.flag_registers)
 
 
         else:
@@ -347,11 +347,11 @@ class CPU:
     def run(self):
         """Run the CPU."""
         while self.running:
-            self.trace()
-            print(self.pc) 
+            #self.trace()
+            #print(self.pc) 
             instruction_register = self.read_ram(self.pc)
             #print(instruction_register)
-            print("Before instruction is called pc value is: {}".format(self.pc))
+            #print("Before instruction is called pc value is: {}".format(self.pc))
             #self.instruction_set(instruction_register)
            
 
@@ -364,10 +364,10 @@ class CPU:
 
            
             command = self.instruction_table[instruction_register]
-            print("CALLING {}" .format(command.__name__))
+            #print("CALLING {}" .format(command.__name__))
 
             command()
-            print("After the above instruction call the pc value is {}".format(self.pc))
+            #print("After the above instruction call the pc value is {}".format(self.pc))
             
 
         print("TERMINATED")
